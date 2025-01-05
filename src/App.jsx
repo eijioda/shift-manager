@@ -112,16 +112,53 @@ function App() {
 
   // 画面の描画
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ 
+      padding: '20px', 
+      maxWidth: '800px', 
+      margin: '0 auto',
+      backgroundColor: 'white',  // 背景色を白に
+      color: 'black',           // 文字色を黒に
+      minHeight: '100vh'        // 最小の高さを画面いっぱいに
+    }}>
+      <h1 style={{ 
+        textAlign: 'center', 
+        marginBottom: '20px',
+        color: 'black'          // タイトルの文字色を黒に
+      }}>シフト管理</h1>
+
       {/* モード切り替えボタン */}
       <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <button onClick={() => setMode('preferences')}>
+        <button 
+          onClick={() => setMode('preferences')}
+          style={{
+            padding: '10px 20px',
+            margin: '0 10px',
+            backgroundColor: mode === 'preferences' ? '#4CAF50' : '#e0e0e0',
+            color: mode === 'preferences' ? 'white' : 'black',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
           希望入力
         </button>
-        <button onClick={() => setMode('schedule')}>
+        <button 
+          onClick={() => setMode('schedule')}
+          style={{
+            padding: '10px 20px',
+            margin: '0 10px',
+            backgroundColor: mode === 'schedule' ? '#4CAF50' : '#e0e0e0',
+            color: mode === 'schedule' ? 'white' : 'black',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
           シフト確認
         </button>
       </div>
+
+      {/* 以下、既存のコードはそのまま */}
 
       {/* 希望入力画面 */}
       {mode === 'preferences' && (
