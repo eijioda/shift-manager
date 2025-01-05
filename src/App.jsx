@@ -1,29 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, onValue, set } from 'firebase/database';// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAaXCLsoa_qeCZv8WILiXaxqw_tREP0_qM",
+  authDomain: "shift-manager-44ee7.firebaseapp.com",
+  databaseURL: "https://shift-manager-44ee7-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "shift-manager-44ee7",
+  storageBucket: "shift-manager-44ee7.firebasestorage.app",
+  messagingSenderId: "526799917543",
+  appId: "1:526799917543:web:af30f949cb34b2ba932d42"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// ここに先ほどコピーしたfirebaseConfigを貼り付け
+const firebaseConfig = {// Import the functions you need from the SDKs you need
+  import { initializeApp } from "firebase/app";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+  
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAaXCLsoa_qeCZv8WILiXaxqw_tREP0_qM",
+    authDomain: "shift-manager-44ee7.firebaseapp.com",
+    databaseURL: "https://shift-manager-44ee7-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "shift-manager-44ee7",
+    storageBucket: "shift-manager-44ee7.firebasestorage.app",
+    messagingSenderId: "526799917543",
+    appId: "1:526799917543:web:af30f949cb34b2ba932d42"
+  };
+  
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  // Firebase Consoleからコピーした設定をここに貼り付け
+};
+
+// Firebaseの初期化
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 
 function App() {
-  // 日付の設定
   const dates = ['1/6', '1/11', '1/12', '1/20', '1/25'];
-  
-  // シフト時間
   const times = {
     morning: '7:00-11:00',
     afternoon: '14:00-16:30'
   };
 
-  // シフトのデータ管理
-  const [shifts, setShifts] = useState(
-    dates.reduce((acc, date) => ({
-      ...acc,
-      [date]: { staff: '' }
-    }), {})
-  );
+  const [shifts, setShifts] = useState({});
+
+  // Firebaseからデータを読み込み
+  useEffect(() => {
+    const shiftsRef = ref(db, 'shifts');
+    onValue(shiftsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setShifts(data);
+      } else {
+        // 初期データの設定
+        const initialShifts = dates.reduce((acc, date) => ({
+          ...acc,
+          [date]: { staff: '' }
+        }), {});
+        setShifts(initialShifts);
+        set(shiftsRef, initialShifts);
+      }
+    });
+  }, []);
 
   // スタッフ名の変更処理
   const handleStaffChange = (date, name) => {
-    setShifts({
+    const newShifts = {
       ...shifts,
       [date]: { staff: name }
-    });
+    };
+    setShifts(newShifts);
+    // Firebaseにデータを保存
+    set(ref(db, 'shifts'), newShifts);
   };
 
   return (
@@ -69,7 +128,7 @@ function App() {
 
           <input
             type="text"
-            value={shifts[date].staff}
+            value={shifts[date]?.staff || ''}
             onChange={(e) => handleStaffChange(date, e.target.value)}
             placeholder="担当者名を入力"
             style={{
